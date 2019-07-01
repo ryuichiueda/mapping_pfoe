@@ -2,9 +2,12 @@
   <include file="$(find mapping_pfoe)/launch/run_move_base.launch"/>
   <include file="$(find mapping_pfoe)/launch/run_amcl.launch"/>
 
+ <!-- <node pkg="map_server" type="map_saver" name="map_saver" args="-f /tmp/map" /> -->
+ <!-- <node pkg="mapping_pfoe" type="navigator" name="navigator" output="screen" /> -->
+
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mapping_pfoe)/config/config.rviz"/>
 
-  <arg name="map_file" default="$(find mapping_pfoe)/maps/ueda_room.yaml"/> 
-  <!--<arg name="map_file" default="/tmp/map.yaml" />-->
+  <arg name="map_file" default="$(find mapping_pfoe)/maps/ueda_room.yaml"/>
+  <!-- <arg name="map_file" default="/tmp/map.yaml" /> -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen"/>
 </launch>
