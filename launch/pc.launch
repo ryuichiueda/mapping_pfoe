@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find mapping_pfoe)/launch/run_move_base.launch"/>
+  <!-- <include file="$(find mapping_pfoe)/launch/run_move_base.launch"/> -->
   <include file="$(find mapping_pfoe)/launch/run_amcl.launch"/>
 
  <!-- <node pkg="map_server" type="map_saver" name="map_saver" args="-f /tmp/map" /> -->
