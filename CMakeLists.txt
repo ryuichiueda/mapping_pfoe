@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   move_base_msgs
   actionlib
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
