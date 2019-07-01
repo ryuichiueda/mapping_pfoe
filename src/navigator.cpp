@@ -45,14 +45,16 @@ bool read_trajectory(string filename)
 int main(int argc, char **argv)
 {
 	read_trajectory("/tmp/trajectory.tsv");
-	return 0;
 
 	ros::init(argc,argv,"navigator");
 	ros::NodeHandle n;
 
 	actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> ac("move_base", true);
 
-//	Subscriber sub = n.subscribe("/trajectory_node_list", 1, cbTeaching);
+ 	while(!ac.waitForServer(ros::Duration(5.0))){
+		ROS_INFO("Waiting for the move_base action server to come up");
+	}
+
 	ros::spin();
 
 	return 0;

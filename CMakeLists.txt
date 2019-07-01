@@ -7,7 +7,11 @@ add_compile_options(-std=c++14)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  move_base_msgs
+  actionlib
+)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -99,10 +103,10 @@ find_package(catkin REQUIRED COMPONENTS roscpp)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES mapping_pfoe
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
+	#  INCLUDE_DIRS include
+  LIBRARIES mapping_pfoe
+  CATKIN_DEPENDS actionlib move_base_msgs roscpp
+  #DEPENDS system_lib
 )
 
 ###########
@@ -148,8 +152,6 @@ add_executable(trajectory_extractor src/trajectory_extractor.cpp)
 target_link_libraries(navigator ${catkin_LIBRARIES})
 target_link_libraries(trajectory_extractor ${catkin_LIBRARIES})
 
-#   ${catkin_LIBRARIES}
-# )
 
 #############
 ## Install ##
