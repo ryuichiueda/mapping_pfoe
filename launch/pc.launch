@@ -5,7 +5,7 @@
  <!-- <node pkg="map_server" type="map_saver" name="map_saver" args="-f /tmp/map" /> -->
   <node pkg="mapping_pfoe" type="navigator" name="navigator" output="screen" />
 
- <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mapping_pfoe)/config/config.rviz"/>-->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mapping_pfoe)/config/config.rviz"/>
 
   <!--<arg name="map_file" default="$(find mapping_pfoe)/maps/ueda_room.yaml"/>-->
   <arg name="map_file" default="/tmp/map.yaml" />
