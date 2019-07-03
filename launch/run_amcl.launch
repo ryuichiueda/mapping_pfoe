@@ -3,7 +3,7 @@
   <!-- https://raw.githubusercontent.com/zaki0929/raspimouse_navigation_2/master/launch/run_amcl.launch -->
   <node pkg="trajectory_amcl" type="trajectory_amcl" name="trajectory_amcl" output="screen">
     <!-- Publish scans from best pose at a max of 10 Hz -->
-    <param name="odom_model_type" value="diff"/>
+    <param name="odom_model_type" value="diff" />
     <param name="transform_tolerance" value="0.5"/>
     <param name="gui_publish_rate" value="10.0"/>  <!-- 10.0 -->
     <param name="laser_max_beams" value="30"/>
@@ -11,11 +11,11 @@
     <param name="max_particles" value="500"/>
     <param name="kld_err" value="0.05"/>
     <param name="kld_z" value="0.99"/>
-    <param name="odom_alpha1" value="0.3"/>  <!-- rr -->
-    <param name="odom_alpha2" value="0.1"/>  <!-- rt -->
+    <param name="odom_alpha1" value="5.0"/>  <!-- rr -->
+    <param name="odom_alpha2" value="5.0"/>  <!-- rt -->
     <!-- translation std dev, m -->
-    <param name="odom_alpha3" value="0.3"/>  <!-- tt -->
-    <param name="odom_alpha4" value="0.1"/>  <!-- tr -->
+    <param name="odom_alpha3" value="5.0"/>  <!-- tt -->
+    <param name="odom_alpha4" value="5.0"/>  <!-- tr -->
     <param name="laser_z_hit" value="0.5"/>
     <param name="laser_z_short" value="0.05"/>
     <param name="laser_z_max" value="0.05"/>

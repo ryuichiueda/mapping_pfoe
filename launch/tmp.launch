@@ -1,7 +1,7 @@
 <!-- thanks to https://qiita.com/idev_jp/items/579933851d3cf1dfc404 -->
 
 <launch>
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mapping_pfoe)/config/relocalization.rviz"/>
+  <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mapping_pfoe)/config/relocalization.rviz"/> -->
 
   <node pkg="map_server" type="map_saver" name="map_saver" args="-f /tmp/map" />
   <node pkg="mapping_pfoe" type="trajectory_extractor" name="trajectory_extractor" output="screen" />
@@ -13,7 +13,7 @@
       type="cartographer_node" args="
           -configuration_directory $(find raspimouse_cartographer)/config
           -configuration_basename backpack_2d.lua
-          -load_state_filename $(find mapping_pfoe)/bag_and_maps/20190625_square.pbstream"
+          -load_state_filename /home/ueda/2019-07-02-12-52-00.bag.pbstream"
       output="screen">
   </node>
 </launch>

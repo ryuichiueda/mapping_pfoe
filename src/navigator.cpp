@@ -50,7 +50,6 @@ bool read_trajectory(string filename)
 
 void cb(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
 {
-	ROS_INFO("amcl_pose");
 	x = msg->pose.pose.position.x; 
 	y = msg->pose.pose.position.y; 
 	yaw = tf::getYaw(msg->pose.pose.orientation)/3.141592*180;
@@ -82,30 +81,27 @@ int main(int argc, char **argv)
 
 		double target_r = sqrt((target_x-x)*(target_x-x) + (target_y-y)*(target_y-y));
 
-		if(target_r < 0.3){
+		if(target_r < 0.1){
 			prev_step = step;
 			step = (step+1)%trajectory.size();
 			continue;
 		}
 
-		double target_yaw = atan2(target_y - prev_y, target_x - prev_x)/3.141592*180;
+		double target_direction = atan2(target_y-y, target_x-x)/3.141592*180 - yaw;
 
-		double diff = target_yaw - yaw;
-		if(diff > 180.0) diff -= 360.0;
-		if(diff < -180.0) diff += 360.0;
+		if(target_direction > 180.0) target_direction -= 360.0;
+		if(target_direction < -180.0) target_direction += 360.0;
 
-		if(fabs(diff) > 5.0){
-			tw.linear.x = 0.0;
+		if( (fabs(target_direction) > 5.0 and target_r < 0.2) or fabs(target_direction) > 30.0 ){
+			tw.linear.x /= 1.2;
 		}else{
 			tw.linear.x = 0.2;
 		}
-		tw.angular.z = 3*diff*3.141592/180;
-		if(tw.angular.z > 2.0)
-			tw.angular.z = 2.0;
-		else if(tw.angular.z < -2.0)
-			tw.angular.z = -2.0;
 
-		ROS_INFO("point %d\t%f\t%f", step, target_r, diff);
+		tw.angular.z = 2*target_direction*3.141592/180;
+		if(tw.angular.z > 2.0)       tw.angular.z = 2.0;
+		else if(tw.angular.z < -2.0) tw.angular.z = -2.0;
+
 		pub.publish(tw);
 
 		ros::spinOnce();
