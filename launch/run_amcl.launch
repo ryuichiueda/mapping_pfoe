@@ -1,7 +1,5 @@
 <launch>
-  <!-- © 2017-2018 zaki0929 -->
-  <!-- https://raw.githubusercontent.com/zaki0929/raspimouse_navigation_2/master/launch/run_amcl.launch -->
-  <node pkg="trajectory_amcl" type="trajectory_amcl" name="trajectory_amcl" output="screen">
+  <node pkg="amcl" type="amcl" name="amcl" output="screen">
     <!-- Publish scans from best pose at a max of 10 Hz -->
     <param name="odom_model_type" value="diff" />
     <param name="transform_tolerance" value="0.5"/>

@@ -8,15 +8,16 @@
 #include <string> 
 
 #include "raspimouse_ros_2/ButtonValues.h"
+#include "raspimouse_ros_2/LedValues.h"
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Twist.h>
 
 #include "visualization_msgs/MarkerArray.h"
 
-using namespace std;
+using namespace ros;
 
 bool load_finished = false;
-vector<geometry_msgs::Point> trajectory;
+std::vector<geometry_msgs::Point> trajectory;
 int step = 0;
 
 double x = 0.0;
@@ -24,10 +25,11 @@ double y = 0.0;
 double yaw = 0.0;
 
 bool replay_start = false;
+bool replay_finished = false;
 
-bool read_trajectory(string filename)
+bool read_trajectory(std::string filename)
 {
-	ifstream f(filename);
+	std::ifstream f(filename);
 	if(!f)
 		return false;
 
@@ -64,24 +66,36 @@ void callbackButtons(const raspimouse_ros_2::ButtonValues::ConstPtr& msg)
 		ROS_INFO("replay start");
 		replay_start = true;
 	}
+	if (msg->rear){
+		ROS_INFO("replay finished");
+		replay_finished = true;
+	}
 }
 
 int main(int argc, char **argv)
 {
 	read_trajectory("/tmp/trajectory.tsv");
 
-	ros::init(argc,argv,"navigator");
-	ros::NodeHandle n;
+	init(argc,argv,"navigator");
+	NodeHandle n;
 
-	ros::Subscriber sub_pose = n.subscribe("/amcl_pose", 1, callbackPose);
-	ros::Subscriber sub_button = n.subscribe("/buttons", 1, callbackButtons);
-	ros::Publisher pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+	Subscriber sub_pose = n.subscribe("/amcl_pose", 1, callbackPose);
+	Subscriber sub_button = n.subscribe("/buttons", 1, callbackButtons);
+	Publisher pub_cmd_vel = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+	Publisher pub_led = n.advertise<raspimouse_ros_2::LedValues>("leds", 5);
 
-	ros::Rate r(10);
-	while(ros::ok()){ //waiting the center button
+	raspimouse_ros_2::LedValues leds;
+	leds.left_side = false;
+	leds.right_side = false;
+	leds.left_forward = true;
+	leds.right_forward = false;
+
+	Rate r(10);
+	while(ok()){ //waiting the center button
+                pub_led.publish(leds);
 		if(replay_start)
 			break;
-		ros::spinOnce();
+		spinOnce();
 		r.sleep();
 	}
 
@@ -91,7 +105,7 @@ int main(int argc, char **argv)
 
 	int step = 0;
 	int prev_step = trajectory.size() - 1;
-	while(ros::ok()){
+	while(ok()){
 		double prev_x = trajectory[prev_step].x;
 		double prev_y = trajectory[prev_step].y;
 		double target_x = trajectory[step].x;
@@ -120,9 +134,12 @@ int main(int argc, char **argv)
 		if(tw.angular.z > 2.0)       tw.angular.z = 2.0;
 		else if(tw.angular.z < -2.0) tw.angular.z = -2.0;
 
-		pub.publish(tw);
+		pub_cmd_vel.publish(tw);
 
-		ros::spinOnce();
+		if(replay_finished)
+			break;
+
+		spinOnce();
 		r.sleep();
 	}
 
