@@ -7,6 +7,7 @@
 #include <vector> 
 #include <string> 
 
+#include "raspimouse_ros_2/ButtonValues.h"
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Twist.h>
 
@@ -21,6 +22,8 @@ int step = 0;
 double x = 0.0;
 double y = 0.0;
 double yaw = 0.0;
+
+bool replay_start = false;
 
 bool read_trajectory(string filename)
 {
@@ -48,13 +51,20 @@ bool read_trajectory(string filename)
 	return true;
 }
 
-void cb(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
+void callbackPose(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
 {
 	x = msg->pose.pose.position.x; 
 	y = msg->pose.pose.position.y; 
 	yaw = tf::getYaw(msg->pose.pose.orientation)/3.141592*180;
 }
 
+void callbackButtons(const raspimouse_ros_2::ButtonValues::ConstPtr& msg)
+{
+	if (msg->mid){
+		ROS_INFO("replay start");
+		replay_start = true;
+	}
+}
 
 int main(int argc, char **argv)
 {
@@ -63,8 +73,17 @@ int main(int argc, char **argv)
 	ros::init(argc,argv,"navigator");
 	ros::NodeHandle n;
 
-	ros::Subscriber sub = n.subscribe("/amcl_pose", 1, cb);
+	ros::Subscriber sub_pose = n.subscribe("/amcl_pose", 1, callbackPose);
+	ros::Subscriber sub_button = n.subscribe("/buttons", 1, callbackButtons);
 	ros::Publisher pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+
+	ros::Rate r(10);
+	while(ros::ok()){ //waiting the center button
+		if(replay_start)
+			break;
+		ros::spinOnce();
+		r.sleep();
+	}
 
 	geometry_msgs::Twist tw;
 	tw.linear.x = 0.0;
@@ -72,7 +91,6 @@ int main(int argc, char **argv)
 
 	int step = 0;
 	int prev_step = trajectory.size() - 1;
-	ros::Rate r(10);
 	while(ros::ok()){
 		double prev_x = trajectory[prev_step].x;
 		double prev_y = trajectory[prev_step].y;

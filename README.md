@@ -1,4 +1,4 @@
-# mapping_pfoe
+# raspimouse_cartographer_teach_and_replay
 
 a teach-and-replay package for Raspberry Pi Mouse
 
@@ -36,8 +36,8 @@ Please place a map in [maps](./maps) and launch nodes with `robot.launch` and `p
 
 
 ```
-(robot side)$ roslaunch mapping_pfoe robot.launch
-(pc side   )$ roslaunch mapping_pfoe pc.launch
+(robot side)$ roslaunch raspimouse_cartographer_teach_and_replay robot.launch
+(pc side   )$ roslaunch raspimouse_cartographer_teach_and_replay pc.launch
 ```
 
 ## License

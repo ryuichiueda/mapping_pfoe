@@ -1,0 +1,13 @@
+<launch>
+  <!-- <include file="$(find raspimouse_cartographer_teach_and_replay)/launch/run_move_base.launch"/> -->
+  <include file="$(find raspimouse_cartographer_teach_and_replay)/launch/run_amcl.launch"/>
+
+ <!-- <node pkg="map_server" type="map_saver" name="map_saver" args="-f /tmp/map" /> -->
+  <node pkg="raspimouse_cartographer_teach_and_replay" type="navigator" name="navigator" output="screen" />
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find raspimouse_cartographer_teach_and_replay)/config/config.rviz"/>
+
+  <!--<arg name="map_file" default="$(find raspimouse_cartographer_teach_and_replay)/maps/ueda_room.yaml"/>-->
+  <arg name="map_file" default="/tmp/map.yaml" />
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen"/>
+</launch>

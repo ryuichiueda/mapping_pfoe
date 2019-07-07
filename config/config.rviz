@@ -154,6 +154,14 @@ Visualization Manager:
       Topic: /move_base/current_goal
       Unreliable: false
       Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /trajectory_node_list
+      Name: MarkerArray
+      Namespaces:
+        Trajectory 0: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -218,5 +226,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1373
-  X: 239
-  Y: 1107
+  X: 67
+  Y: 27
