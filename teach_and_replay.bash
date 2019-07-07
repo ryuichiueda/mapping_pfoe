@@ -2,5 +2,5 @@
 
 roslaunch raspimouse_cartographer slam.launch
 
-roslaunch raspimouse_cartographer_teach_and_replay replay.launch
+roslaunch raspimouse_map_based_teach_and_replay replay.launch
 
