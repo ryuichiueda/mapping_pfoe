@@ -159,7 +159,7 @@ Visualization Manager:
       Marker Topic: /trajectory_node_list
       Name: MarkerArray
       Namespaces:
-        Trajectory 0: true
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -190,7 +190,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 10
+      Distance: 28.757293701171875
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -205,10 +205,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.304796576499939
+      Pitch: 1.5547963380813599
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.20039963722229
+      Yaw: 3.125401258468628
     Saved: ~
 Window Geometry:
   Displays:
