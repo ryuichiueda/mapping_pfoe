@@ -2,42 +2,19 @@
 
 a teach-and-replay package for Raspberry Pi Mouse
 
+## how to use 
 
-## Requirements
-
-This package requires the following:
-* Robot
-  * Raspberry Pi Mouse
-* Laser Rangefinder
-  * URG-04LX-UG01
-* IMU
-  * RT-USB-9AXIS-00
-* Ubuntu
-  * Ubuntu 18.04 (Ubuntu 18.04 Server recomended)
-* ROS
-  * Melodic Morenia
-* ROS Package
-  * urg_node - [urg_node - ROS WiKi](http://wiki.ros.org/urg_node)
-  * raspimouse_ros_2 - [ryuichiueda/raspimouse_ros_2](https://github.com/ryuichiueda/raspimouse_ros_2)
+At first, set up the hardware and software for https://github.com/ryuichiueda/raspimouse_cartographer .
 
 ## Installation
 
-* Install `raspimouse_ros_2`
-    * Check it with the imu
-* Install `urg_node` and `move_base`
 * Clone this package at the `src` directory of the catkin workspace
 * `catkin_make && source ~/catkin_ws/devel/setup.bash`
 
-
 ## Usage
 
-Please place a map in [maps](./maps) and launch nodes with `robot.launch` and `pc.launch` on the Raspberry Pi Mouse side and the PC side respectively.
-
-
-
 ```
-(robot side)$ roslaunch raspimouse_map_based_teach_and_replay robot.launch
-(pc side   )$ roslaunch raspimouse_map_based_teach_and_replay pc.launch
+$ roslaunch raspimouse_map_based_teach_and_replay replay.launch
 ```
 
 ## License
