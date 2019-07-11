@@ -19,6 +19,7 @@ using namespace ros;
 
 bool load_finished = false;
 std::vector<geometry_msgs::Point> trajectory;
+visualization_msgs::MarkerArray marker_array;
 int step = 0;
 
 double x = 0.0;
@@ -28,9 +29,24 @@ double yaw = 0.0;
 bool replay_start = false;
 bool replay_finished = false;
 
-visualization_msgs::Marker markerBuilder(geometry_msgs::Point &p)
+visualization_msgs::Marker markerBuilder(const geometry_msgs::Point &p, int id)
 {
 	visualization_msgs::Marker m;
+
+	m.header.frame_id = "/map";
+	m.type = 2;
+	m.id = id;
+
+	m.scale.x = 0.05;
+	m.scale.y = 0.05;
+	m.scale.z = 0.05;
+	m.pose.position.x = p.x;
+	m.pose.position.y = p.y;
+
+	m.color.r = 0.0f;
+	m.color.g = 1.0f;
+	m.color.b = 0.0f;
+	m.color.a = 0.5f;
 
 	return m;
 }
@@ -103,6 +119,10 @@ void callbackButtons(const raspimouse_ros_2::ButtonValues::ConstPtr& msg)
 int main(int argc, char **argv)
 {
 	read_trajectory("/tmp/trajectory.tsv");
+	int marker_id = 0;
+	for(auto p : trajectory){
+		marker_array.markers.push_back( markerBuilder(p, marker_id++) );
+	}
 
 	init(argc,argv,"navigator");
 	NodeHandle n;
@@ -111,7 +131,7 @@ int main(int argc, char **argv)
 	Subscriber sub_button = n.subscribe("/buttons", 1, callbackButtons);
 	Publisher pub_cmd_vel = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 	Publisher pub_led = n.advertise<raspimouse_ros_2::LedValues>("leds", 5);
-	Publisher pub_marker = n.advertise<visualization_msgs::Marker>("marker", 1);
+	Publisher pub_marker = n.advertise<visualization_msgs::MarkerArray>("marker_array", 5);
 
 	raspimouse_ros_2::LedValues leds;
 	leds.left_side = false;
@@ -121,6 +141,8 @@ int main(int argc, char **argv)
 
 	Rate r(10);
 	while(ok()){ //waiting the center button
+		pub_marker.publish(marker_array);
+
                 pub_led.publish(leds);
 		if(replay_start)
 			break;
@@ -151,22 +173,6 @@ int main(int argc, char **argv)
 		double target_direction = atan2(target_y-y, target_x-x)/3.141592*180 - yaw;
 
 		geometry_msgs::Twist tw = decision(target_r, target_direction);
-
-		/*
-		if(target_direction > 180.0) target_direction -= 360.0;
-		if(target_direction < -180.0) target_direction += 360.0;
-
-		if( (fabs(target_direction) > 5.0 and target_r < 0.2) or fabs(target_direction) > 30.0 ){
-			tw.linear.x /= 1.2;
-		}else{
-			tw.linear.x = 0.2;
-		}
-
-		tw.angular.z = 2*target_direction*3.141592/180;
-		if(tw.angular.z > 2.0)       tw.angular.z = 2.0;
-		else if(tw.angular.z < -2.0) tw.angular.z = -2.0;
-		*/
-
 		pub_cmd_vel.publish(tw);
 
 		if(replay_finished)
