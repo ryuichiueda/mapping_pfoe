@@ -43,10 +43,10 @@ visualization_msgs::Marker markerBuilder(const geometry_msgs::Point &p, int id)
 	m.pose.position.x = p.x;
 	m.pose.position.y = p.y;
 
-	m.color.r = 0.0f;
-	m.color.g = 1.0f;
-	m.color.b = 0.0f;
-	m.color.a = 0.5f;
+	m.color.r = 0.0;
+	m.color.g = 1.0;
+	m.color.b = 0.0;
+	m.color.a = 0.5;
 
 	return m;
 }
@@ -58,10 +58,14 @@ geometry_msgs::Twist decision(double distance, double direction)
 	if(direction > 180.0) direction -= 360.0;
 	if(direction < -180.0) direction += 360.0;
 
-	if( (fabs(direction) > 5.0 and distance < 0.2) or fabs(direction) > 30.0 ){
-		tw.linear.x /= 1.2;
+	if( (fabs(direction) > 10.0 and distance < 0.1) or fabs(direction) > 30.0 ){
+		tw.linear.x /= 1.1;
 	}else{
-		tw.linear.x = 0.2;
+		if(tw.linear.x < 0.05)
+			tw.linear.x = 0.05;
+		tw.linear.x *= 2.0;
+		if(tw.linear.x > 0.4)
+			tw.linear.x = 0.4;
 	}
 
 	tw.angular.z = 2*direction*3.141592/180;
@@ -131,7 +135,8 @@ int main(int argc, char **argv)
 	Subscriber sub_button = n.subscribe("/buttons", 1, callbackButtons);
 	Publisher pub_cmd_vel = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 	Publisher pub_led = n.advertise<raspimouse_ros_2::LedValues>("leds", 5);
-	Publisher pub_marker = n.advertise<visualization_msgs::MarkerArray>("marker_array", 5);
+	Publisher pub_trajectory = n.advertise<visualization_msgs::MarkerArray>("trajectory", 5);
+	Publisher pub_target = n.advertise<visualization_msgs::Marker>("target_marker", 5);
 
 	raspimouse_ros_2::LedValues leds;
 	leds.left_side = false;
@@ -141,7 +146,7 @@ int main(int argc, char **argv)
 
 	Rate r(10);
 	while(ok()){ //waiting the center button
-		pub_marker.publish(marker_array);
+		pub_trajectory.publish(marker_array);
 
                 pub_led.publish(leds);
 		if(replay_start)
@@ -156,6 +161,11 @@ int main(int argc, char **argv)
 
 	int step = 0;
 	int prev_step = trajectory.size() - 1;
+
+	marker_array.markers[step].color.r = 1.0;
+	marker_array.markers[step].color.g = 0.0;
+	pub_trajectory.publish(marker_array);
+
 	while(ok()){
 		double prev_x = trajectory[prev_step].x;
 		double prev_y = trajectory[prev_step].y;
@@ -164,9 +174,16 @@ int main(int argc, char **argv)
 
 		double target_r = sqrt((target_x-x)*(target_x-x) + (target_y-y)*(target_y-y));
 
-		if(target_r < 0.1){
+		if(target_r < 0.05){
 			prev_step = step;
 			step = (step+1)%trajectory.size();
+
+			marker_array.markers[step].color.r = 1.0;
+			marker_array.markers[step].color.g = 0.0;
+			marker_array.markers[prev_step].color.r = 0.0;
+			marker_array.markers[prev_step].color.g = 1.0;
+			pub_trajectory.publish(marker_array);
+
 			continue;
 		}
 
