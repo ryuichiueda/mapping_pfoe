@@ -6,6 +6,7 @@
 #include <iomanip> 
 #include <vector> 
 #include <string> 
+#include <visualization_msgs/Marker.h>
 
 #include "raspimouse_ros_2/ButtonValues.h"
 #include "raspimouse_ros_2/LedValues.h"
@@ -26,6 +27,33 @@ double yaw = 0.0;
 
 bool replay_start = false;
 bool replay_finished = false;
+
+visualization_msgs::Marker markerBuilder(geometry_msgs::Point &p)
+{
+	visualization_msgs::Marker m;
+
+	return m;
+}
+
+geometry_msgs::Twist decision(double distance, double direction)
+{
+	geometry_msgs::Twist tw;
+
+	if(direction > 180.0) direction -= 360.0;
+	if(direction < -180.0) direction += 360.0;
+
+	if( (fabs(direction) > 5.0 and distance < 0.2) or fabs(direction) > 30.0 ){
+		tw.linear.x /= 1.2;
+	}else{
+		tw.linear.x = 0.2;
+	}
+
+	tw.angular.z = 2*direction*3.141592/180;
+	if(tw.angular.z > 2.0)       tw.angular.z = 2.0;
+	else if(tw.angular.z < -2.0) tw.angular.z = -2.0;
+
+	return tw;
+}
 
 bool read_trajectory(std::string filename)
 {
@@ -83,6 +111,7 @@ int main(int argc, char **argv)
 	Subscriber sub_button = n.subscribe("/buttons", 1, callbackButtons);
 	Publisher pub_cmd_vel = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 	Publisher pub_led = n.advertise<raspimouse_ros_2::LedValues>("leds", 5);
+	Publisher pub_marker = n.advertise<visualization_msgs::Marker>("marker", 1);
 
 	raspimouse_ros_2::LedValues leds;
 	leds.left_side = false;
@@ -121,6 +150,9 @@ int main(int argc, char **argv)
 
 		double target_direction = atan2(target_y-y, target_x-x)/3.141592*180 - yaw;
 
+		geometry_msgs::Twist tw = decision(target_r, target_direction);
+
+		/*
 		if(target_direction > 180.0) target_direction -= 360.0;
 		if(target_direction < -180.0) target_direction += 360.0;
 
@@ -133,6 +165,7 @@ int main(int argc, char **argv)
 		tw.angular.z = 2*target_direction*3.141592/180;
 		if(tw.angular.z > 2.0)       tw.angular.z = 2.0;
 		else if(tw.angular.z < -2.0) tw.angular.z = -2.0;
+		*/
 
 		pub_cmd_vel.publish(tw);
 
